@@ -4,6 +4,7 @@ import random
 fields = ['Uuid','Title','ImageURL','FromUuid','ToUuid']
 fields_mapped = {}
 
+
 class NodaItem:
     def __init__(self):
         self._uuid = None
@@ -103,7 +104,7 @@ def getNodeByUUID(uuid, nodaItems):
             pass
 
 
-# Parse the Files and Create the Nodes
+# Parse the Noda Export File and Create the NodaItems
 nodaItems = []
 with open('noda_export.csv', 'r') as noda_file:
     reader = csv.reader(noda_file)
@@ -133,11 +134,13 @@ with open('noda_export.csv', 'r') as noda_file:
             nodaItems.append(nodaItem) 
 
 
-# Add the Child Nodes
+# Add the NodaItem Child Nodes
 for node_to_add_child in nodaItems:
     for node_to_check_child in nodaItems:
         node_to_add_child.addChildNode(node_to_check_child)
 
+
+# Create the AnkiItems
 ankiItems = []
 for node in nodaItems:
     if node.getTitle() != '' and len(node.getChildNodes()) != 0:
@@ -148,6 +151,8 @@ for node in nodaItems:
             ankiItem.addImageURL(child_node.getImageUrl())
         ankiItems.append(ankiItem)
 
+
+# Print the Anki Items to a File
 outputfilename = "noda_anki_deck.csv"
 out = open(outputfilename, "w")
 for ankiItem in ankiItems:
@@ -155,21 +160,8 @@ for ankiItem in ankiItems:
     out.write(ankiItem.printReverseCard()+"\n")
 out.close()
 
-#shuffle the cards in the file
+
+# Shuffle the Cards in the File
 lines = open(outputfilename).readlines()
 random.shuffle(lines)
 open(outputfilename, 'w').writelines(lines)
-
-
-# if a title exists in the node, and it has child nodes.
-# create the anki items  
-# add the title 
-    #get the title from the parent, 
-# add the image url from each of the child nodes to the imgs_url of ankiItem.
-    #get the img_url from the child.
-
-
-#Take the root UUIDS, that also match some criteria for inclusion in the deck.
-#* E.g. Tetra shape.
-#search for links to them.
-
